@@ -11,6 +11,19 @@
   <script src="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
 
   <script>
+    function detectColor(r, g, b) {
+      if (r >= 200 && g >= 100 && g <= 200 && b >= 150) {
+        return "Pink - No amplification";
+      }
+      if (r >= 200 && g >= 100 && g <= 180 && b <= 100) {
+        return "Orange - Amplifying";
+      }
+      if (r >= 200 && g >= 200 && b <= 100) {
+        return "Yellow - Amplified";
+      }
+      return "Other color";
+    }
+
     window.onload = function () {
       const canvas = document.getElementById('myCanvas');
       const context = canvas.getContext("2d");
@@ -33,7 +46,6 @@
             const img = new Image();
 
             img.onload = function () {
-              console.log("Image loaded.");
               context.clearRect(0, 0, canvas.width, canvas.height);
               context.drawImage(img, 0, 0, 600, 500); // Standard draw
 
@@ -43,7 +55,9 @@
                 const y = Math.floor(event.clientY - rect.top);
                 const pixel = context.getImageData(x, y, 1, 1).data;
                 const [r, g, b, a] = pixel;
-                messageDisplayArea.innerHTML = `RGB at (${x}, ${y}): R=${r}, G=${g}, B=${b}`;
+
+                const detected = detectColor(r, g, b);
+                messageDisplayArea.innerHTML = `RGB at (${x}, ${y}): R=${r}, G=${g}, B=${b} → <strong>${detected}</strong>`;
               });
             };
 
