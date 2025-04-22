@@ -12,7 +12,7 @@
 
   <script>
     function detectColor(r, g, b) {
-      if (r >= 200 && g >= 100 && g <= 200 && b >= 150) {
+      if (r >= 200 && g >= 50 && g <= 200 && b >= 150) {
         return "Pink - No amplification";
       }
       if (r >= 200 && g >= 100 && g <= 180 && b <= 100) {
@@ -40,10 +40,8 @@
       context.fillStyle = "black";
       context.fillText("Original image will go here", 10, 20);
 
+      // Clear the second canvas
       context2.clearRect(0, 0, canvas2.width, canvas2.height);
-      context2.font = '20pt Calibri';
-      context2.fillStyle = "blue";
-      context2.fillText("Amplification result will appear here", 10, 20);
 
       fileInput.addEventListener('change', function () {
         const file = fileInput.files[0];
@@ -71,9 +69,9 @@
         }
       });
 
-      // ✅ Click handler (attached once)
+      // Click handler for pixel selection
       canvas.addEventListener("click", function (event) {
-        if (!imageLoaded) return; // Only respond if image has been drawn
+        if (!imageLoaded) return;
 
         const rect = canvas.getBoundingClientRect();
         const x = Math.floor(event.clientX - rect.left);
@@ -83,14 +81,14 @@
 
         const label = detectColor(r, g, b);
 
-        // Update message box
+        // Show text output below upload
         messageDisplayArea.innerHTML = `
           <div><strong>Clicked Position:</strong> (${x}, ${y})</div>
           <div><strong>RGB:</strong> R=${r}, G=${g}, B=${b}</div>
           <div><strong>Detected Label:</strong> <span style="color: #aa0000">${label}</span></div>
         `;
 
-        // Update second canvas
+        // Write result to second canvas
         context2.clearRect(0, 0, canvas2.width, canvas2.height);
         context2.font = '24pt Calibri';
         context2.fillStyle = "#000088";
