@@ -31,16 +31,19 @@
       const canvas2 = document.getElementById('dataCanvas');
       const context2 = canvas2.getContext("2d");
 
+      const fileInput = document.getElementById('fileInput');
+      const messageDisplayArea = document.getElementById('messageDisplayArea');
+
+      let imageLoaded = false;
+
       context.font = '20pt Calibri';
       context.fillStyle = "black";
       context.fillText("Original image will go here", 10, 20);
 
+      context2.clearRect(0, 0, canvas2.width, canvas2.height);
       context2.font = '20pt Calibri';
       context2.fillStyle = "blue";
       context2.fillText("Amplification result will appear here", 10, 20);
-
-      const fileInput = document.getElementById('fileInput');
-      const messageDisplayArea = document.getElementById('messageDisplayArea');
 
       fileInput.addEventListener('change', function () {
         const file = fileInput.files[0];
@@ -56,29 +59,7 @@
             img.onload = function () {
               context.clearRect(0, 0, canvas.width, canvas.height);
               context.drawImage(img, 0, 0, 600, 500);
-
-              canvas.addEventListener("click", function (event) {
-                const rect = canvas.getBoundingClientRect();
-                const x = Math.floor(event.clientX - rect.left);
-                const y = Math.floor(event.clientY - rect.top);
-                const pixel = context.getImageData(x, y, 1, 1).data;
-                const [r, g, b, a] = pixel;
-
-                const label = detectColor(r, g, b);
-
-                // Update HTML text
-                messageDisplayArea.innerHTML = `
-                  <div><strong>Clicked Position:</strong> (${x}, ${y})</div>
-                  <div><strong>RGB:</strong> R=${r}, G=${g}, B=${b}</div>
-                  <div><strong>Detected Label:</strong> <span style="color: #aa0000">${label}</span></div>
-                `;
-
-                // Update second canvas
-                context2.clearRect(0, 0, canvas2.width, canvas2.height);
-                context2.font = '24pt Calibri';
-                context2.fillStyle = "#000088";
-                context2.fillText(`Detected: ${label}`, 20, 60);
-              });
+              imageLoaded = true;
             };
 
             img.src = reader.result;
@@ -88,6 +69,32 @@
         } else {
           messageDisplayArea.innerHTML = "File not supported!";
         }
+      });
+
+      // ✅ Click handler (attached once)
+      canvas.addEventListener("click", function (event) {
+        if (!imageLoaded) return; // Only respond if image has been drawn
+
+        const rect = canvas.getBoundingClientRect();
+        const x = Math.floor(event.clientX - rect.left);
+        const y = Math.floor(event.clientY - rect.top);
+        const pixel = context.getImageData(x, y, 1, 1).data;
+        const [r, g, b, a] = pixel;
+
+        const label = detectColor(r, g, b);
+
+        // Update message box
+        messageDisplayArea.innerHTML = `
+          <div><strong>Clicked Position:</strong> (${x}, ${y})</div>
+          <div><strong>RGB:</strong> R=${r}, G=${g}, B=${b}</div>
+          <div><strong>Detected Label:</strong> <span style="color: #aa0000">${label}</span></div>
+        `;
+
+        // Update second canvas
+        context2.clearRect(0, 0, canvas2.width, canvas2.height);
+        context2.font = '24pt Calibri';
+        context2.fillStyle = "#000088";
+        context2.fillText(`Detected: ${label}`, 20, 60);
       });
     };
   </script>
