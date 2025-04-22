@@ -27,9 +27,17 @@
     window.onload = function () {
       const canvas = document.getElementById('myCanvas');
       const context = canvas.getContext("2d");
+
+      const canvas2 = document.getElementById('dataCanvas');
+      const context2 = canvas2.getContext("2d");
+
       context.font = '20pt Calibri';
       context.fillStyle = "black";
       context.fillText("Original image will go here", 10, 20);
+
+      context2.font = '20pt Calibri';
+      context2.fillStyle = "blue";
+      context2.fillText("Amplification result will appear here", 10, 20);
 
       const fileInput = document.getElementById('fileInput');
       const messageDisplayArea = document.getElementById('messageDisplayArea');
@@ -47,7 +55,7 @@
 
             img.onload = function () {
               context.clearRect(0, 0, canvas.width, canvas.height);
-              context.drawImage(img, 0, 0, 600, 500); // Standard draw
+              context.drawImage(img, 0, 0, 600, 500);
 
               canvas.addEventListener("click", function (event) {
                 const rect = canvas.getBoundingClientRect();
@@ -56,8 +64,20 @@
                 const pixel = context.getImageData(x, y, 1, 1).data;
                 const [r, g, b, a] = pixel;
 
-                const detected = detectColor(r, g, b);
-                messageDisplayArea.innerHTML = `RGB at (${x}, ${y}): R=${r}, G=${g}, B=${b} → <strong>${detected}</strong>`;
+                const label = detectColor(r, g, b);
+
+                // Update HTML text
+                messageDisplayArea.innerHTML = `
+                  <div><strong>Clicked Position:</strong> (${x}, ${y})</div>
+                  <div><strong>RGB:</strong> R=${r}, G=${g}, B=${b}</div>
+                  <div><strong>Detected Label:</strong> <span style="color: #aa0000">${label}</span></div>
+                `;
+
+                // Update second canvas
+                context2.clearRect(0, 0, canvas2.width, canvas2.height);
+                context2.font = '24pt Calibri';
+                context2.fillStyle = "#000088";
+                context2.fillText(`Detected: ${label}`, 20, 60);
               });
             };
 
@@ -85,18 +105,11 @@
         Press orange button to create or choose image file:
         <input type="file" id="fileInput" style="background-color: #FF6600;">
       </div>
-      <div id="messageDisplayArea" style="margin-top:10px;"></div>
+      <div id="messageDisplayArea" style="margin-top:10px; font-size: 16px;"></div>
 
-      <canvas id="myCanvas" width="600" height="500" style="border:1px solid #d3d3d3;"></canvas>
+      <canvas id="myCanvas" width="600" height="500" style="border:1px solid #d3d3d3; margin-top:10px;"></canvas>
 
-      <canvas id="dataCanvas" width="600" height="500" style="border:1px solid #d3d3d3;"></canvas>
-      <script>
-        const canvas2 = document.getElementById('dataCanvas');
-        const context2 = canvas2.getContext("2d");
-        context2.font = '20pt Calibri';
-        context2.fillStyle = "blue";
-        context2.fillText("Blue image will go here", 10, 20);
-      </script>
+      <canvas id="dataCanvas" width="600" height="500" style="border:1px solid #d3d3d3; margin-top:10px;"></canvas>
     </div>
 
     <div data-role="footer" data-position="fixed">
